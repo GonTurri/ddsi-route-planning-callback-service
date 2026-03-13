@@ -2,21 +2,22 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { RoutingStatus } from './routing-status.enum';
+import type { RoutingPayload } from './routing-payload';
 
 @Entity('routing_requests')
 export class RoutingRequest {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id: string;
 
   @Column({ name: 'api_key', type: 'uuid' })
   apiKey: string;
 
   @Column({ type: 'jsonb' })
-  payload: Record<string, unknown>;
+  payload: RoutingPayload;
 
   @Column({
     type: 'enum',

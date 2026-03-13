@@ -26,6 +26,7 @@ export class ApiKeyGuard implements CanActivate {
       );
     }
 
+    //7 es el largo de "Bearer "
     const apiKey = authHeader.slice(7);
     const group = await this.groupsService.findByApiKey(apiKey);
 
