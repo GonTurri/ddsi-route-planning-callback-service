@@ -3,7 +3,6 @@ import {
   Controller,
   HttpCode,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ApiKeyGuard } from '../../shared/guards/api-key.guard';
@@ -11,8 +10,6 @@ import { CurrentGroup } from '../../shared/decorators/current-group.decorator';
 import { IngestionService } from '../services/ingestion.service';
 import { PlanRouteDto } from '../dtos/request/plan-route.dto';
 import { PlanRouteResponseDto } from '../dtos/response/plan-route-response.dto';
-import { UpdateCallbackDto } from '../dtos/request/update-callback.dto';
-import { UpdateCallbackResponseDto } from '../dtos/response/update-callback-response.dto';
 import { StudentGroup } from '../../groups/entities/student-group.entity';
 
 @Controller()
@@ -27,13 +24,5 @@ export class IngestionController {
     @CurrentGroup() group: StudentGroup,
   ): Promise<PlanRouteResponseDto> {
     return this.ingestionService.saveRoutingRequest(dto, group.id);
-  }
-
-  @Put('callback')
-  updateCallback(
-    @Body() dto: UpdateCallbackDto,
-    @CurrentGroup() group: StudentGroup,
-  ): Promise<UpdateCallbackResponseDto> {
-    return this.ingestionService.updateCallbackUrl(group, dto.callbackUrl);
   }
 }

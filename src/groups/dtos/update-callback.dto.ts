@@ -1,6 +1,6 @@
 import { IsUrl } from 'class-validator';
 
 export class UpdateCallbackDto {
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   callbackUrl: string;
 }
