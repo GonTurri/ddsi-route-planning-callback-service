@@ -1,10 +1,10 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoutingRequest } from '../entities/routing-request.entity';
-import { PlanRouteDto } from '../dtos/plan-route.dto';
-import { PlanRouteResponseDto } from '../dtos/plan-route-response.dto';
-import { UpdateCallbackResponseDto } from '../dtos/update-callback-response.dto';
+import { PlanRouteDto } from '../dtos/request/plan-route.dto';
+import { PlanRouteResponseDto } from '../dtos/response/plan-route-response.dto';
+import { UpdateCallbackResponseDto } from '../dtos/response/update-callback-response.dto';
 import { StudentGroup } from '../../groups/entities/student-group.entity';
 import { RoutingStatus } from '../entities/routing-status.enum';
 
@@ -23,7 +23,7 @@ export class IngestionService {
   ): Promise<PlanRouteResponseDto> {
     const existing = await this.requestsRepo.findOneBy({ id: dto.requestId });
     if (existing) {
-      throw new ConflictException(`requestId ${dto.requestId} already exists`);
+      return { requestId: existing.id, status: existing.status };
     }
 
     const request = this.requestsRepo.create({
