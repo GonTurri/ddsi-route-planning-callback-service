@@ -2,6 +2,7 @@ import { IsNumber, IsString, Min } from 'class-validator';
 
 // truck DTO = camión DTO
 export class TruckDto {
+  //todo: contemplar el caso que nos mandan una lista de truck con id repetidos.
   @IsString()
   truckId: string;
 
