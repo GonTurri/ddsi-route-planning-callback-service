@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { RoutingRequest } from '../entities/routing-request.entity';
 import { PlanRouteDto } from '../dtos/request/plan-route.dto';
 import { PlanRouteResponseDto } from '../dtos/response/plan-route-response.dto';
-import { StudentGroup } from '../../groups/entities/student-group.entity';
 import { RoutingStatus } from '../entities/routing-status.enum';
 
 @Injectable()
