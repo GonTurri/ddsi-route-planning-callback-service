@@ -108,6 +108,8 @@ export class PlanningService {
         data: routePlanningResult,
       };
 
+      console.log(`Worker result: ${JSON.stringify(routePlanningResult)}`)
+
       await runner2.query(
         `INSERT INTO webhook_outbox (id, request_id, group_id, payload, status, retry_count, next_attempt_at)
          VALUES ($1, $2, $3, $4, $5, 0, NOW())`,
