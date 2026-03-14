@@ -7,6 +7,7 @@ import {
 import { Request } from 'express';
 import { GroupsService } from '../../groups/services/groups.service';
 import { StudentGroup } from '../../groups/entities/student-group.entity';
+import { isUUID } from 'class-validator';
 
 interface RequestWithGroup extends Request {
   group: StudentGroup;
@@ -28,6 +29,12 @@ export class ApiKeyGuard implements CanActivate {
 
     //7 es el largo de "Bearer "
     const apiKey = authHeader.slice(7);
+
+    if (!isUUID(apiKey)) {
+      throw new UnauthorizedException('Invalid API key format');
+    }
+
+
     const group = await this.groupsService.findByApiKey(apiKey);
 
     if (!group) {

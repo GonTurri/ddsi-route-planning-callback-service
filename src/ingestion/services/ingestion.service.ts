@@ -4,8 +4,6 @@ import { Repository } from 'typeorm';
 import { RoutingRequest } from '../entities/routing-request.entity';
 import { PlanRouteDto } from '../dtos/request/plan-route.dto';
 import { PlanRouteResponseDto } from '../dtos/response/plan-route-response.dto';
-import { UpdateCallbackResponseDto } from '../dtos/response/update-callback-response.dto';
-import { StudentGroup } from '../../groups/entities/student-group.entity';
 import { RoutingStatus } from '../entities/routing-status.enum';
 
 @Injectable()
@@ -13,8 +11,6 @@ export class IngestionService {
   constructor(
     @InjectRepository(RoutingRequest)
     private readonly requestsRepo: Repository<RoutingRequest>,
-    @InjectRepository(StudentGroup)
-    private readonly groupsRepo: Repository<StudentGroup>,
   ) {}
 
   async saveRoutingRequest(
@@ -41,13 +37,5 @@ export class IngestionService {
     return { requestId: saved.id, status: saved.status };
   }
 
-  //? DOCS: esto permite actualizar la callback del webhook, se utilizan los guards para buscar el grupo.
-  async updateCallbackUrl(
-    group: StudentGroup,
-    callbackUrl: string,
-  ): Promise<UpdateCallbackResponseDto> {
-    await this.groupsRepo.update({ id: group.id }, { callbackUrl });
 
-    return { callbackUrl };
-  }
 }
