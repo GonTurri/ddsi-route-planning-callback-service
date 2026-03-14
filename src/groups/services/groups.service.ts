@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StudentGroup } from '../entities/student-group.entity';
@@ -20,6 +20,14 @@ export class GroupsService {
     const apiKey = crypto.randomUUID();
     const id = crypto.randomUUID();
 
+    const existingGroup = await this.studentGroupRepository.findOneBy({
+      groupName: dto.groupName,
+    });
+
+    if (existingGroup) {
+      throw new ConflictException('Group name already exists');
+    }
+
     const group = this.studentGroupRepository.create({
       id,
       groupName: dto.groupName,
@@ -34,7 +42,7 @@ export class GroupsService {
     return { apiKey: savedGroup.apiKey, clientSecret };
   }
 
-    //? DOCS: esto permite actualizar la callback del webhook, se utilizan los guards para buscar el grupo.
+  //? DOCS: esto permite actualizar la callback del webhook, se utilizan los guards para buscar el grupo.
   async updateCallbackUrl(
     group: StudentGroup,
     callbackUrl: string,
