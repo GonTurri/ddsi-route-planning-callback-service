@@ -1,13 +1,26 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { VrpWorkerService } from './vrp-worker.service';
 import { randomUUID } from 'crypto';
 
 import { RoutingStatus } from '../../ingestion/entities/routing-status.enum';
 import { WebhookStatus } from '../../dispatch/entities/webhook-status.enum';
-import { RoutingRequest } from 'src/ingestion/entities/routing-request.entity';
+import { RoutingRequest } from '../../ingestion/entities/routing-request.entity';
+import { WebhookOutbox } from '../../dispatch/entities/webhook-outbox.entity';
 import { PlanningResult } from '../utils/greedy-route-planner';
+
+import type { RoutingPayload } from '../../ingestion/entities/routing-payload';
+
+interface RawRoutingRequest {
+  id: string;
+  group_id: string;
+  payload: RoutingPayload;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+}
 
 @Injectable()
 export class PlanningService {
@@ -16,6 +29,8 @@ export class PlanningService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly vrpWorker: VrpWorkerService,
+    @InjectRepository(RoutingRequest)
+    private readonly requestsRepo: Repository<RoutingRequest>,
   ) {}
 
   @Cron(CronExpression.EVERY_5_SECONDS)
@@ -24,9 +39,8 @@ export class PlanningService {
     await runner.connect();
     await runner.startTransaction();
 
-    let processingRequest: RoutingRequest;
+    let processingRequest: RawRoutingRequest | null = null;
 
-    //TODO: pensar en un batch de liite 5 con thread pool
     try {
       const rows = (await runner.query(
         `SELECT * FROM routing_requests
@@ -35,7 +49,7 @@ export class PlanningService {
          LIMIT 1
          FOR UPDATE SKIP LOCKED`,
         [RoutingStatus.PENDING],
-      )) as RoutingRequest[];
+      )) as RawRoutingRequest[];
 
       if (!rows.length) {
         await runner.rollbackTransaction();
@@ -44,10 +58,9 @@ export class PlanningService {
 
       processingRequest = rows[0];
 
-      await runner.query(
-        `UPDATE routing_requests SET status = $1, updated_at = NOW() WHERE id = $2`,
-        [RoutingStatus.PROCESSING, processingRequest.id],
-      );
+      await runner.manager.update(RoutingRequest, processingRequest.id, {
+        status: RoutingStatus.PROCESSING,
+      });
 
       await runner.commitTransaction();
     } catch (err) {
@@ -88,10 +101,10 @@ export class PlanningService {
         `Error in Worker VRP for request ${processingRequest.id}`,
         workerErr,
       );
-      await this.dataSource.query(
-        `UPDATE routing_requests SET status = $1, updated_at = NOW() WHERE id = $2`,
-        [RoutingStatus.FAILED, processingRequest.id],
-      );
+
+      await this.requestsRepo.update(processingRequest.id, {
+        status: RoutingStatus.FAILED,
+      });
       return;
     }
 
@@ -100,10 +113,9 @@ export class PlanningService {
     await runner2.startTransaction();
 
     try {
-      await runner2.query(
-        `UPDATE routing_requests SET status = $1, updated_at = NOW() WHERE id = $2`,
-        [RoutingStatus.COMPLETED, processingRequest.id],
-      );
+      await runner2.manager.update(RoutingRequest, processingRequest.id, {
+        status: RoutingStatus.COMPLETED,
+      });
 
       const outboxPayload = {
         event_id: `evt_${randomUUID()}`,
@@ -113,19 +125,16 @@ export class PlanningService {
         data: routePlanningResult,
       };
 
-      console.log(`Worker result: ${JSON.stringify(routePlanningResult)}`);
-
-      await runner2.query(
-        `INSERT INTO webhook_outbox (id, request_id, group_id, payload, status, retry_count, next_attempt_at)
-         VALUES ($1, $2, $3, $4, $5, 0, NOW())`,
-        [
-          randomUUID(),
-          processingRequest.id,
-          processingRequest.groupId,
-          outboxPayload,
-          WebhookStatus.PENDING,
-        ],
-      );
+      const newOutboxEntry = runner2.manager.create(WebhookOutbox, {
+        id: randomUUID(),
+        requestId: processingRequest.id,
+        groupId: processingRequest.group_id,
+        payload: outboxPayload,
+        status: WebhookStatus.PENDING,
+        retryCount: 0,
+        nextAttemptAt: new Date(),
+      });
+      await runner2.manager.save(newOutboxEntry);
 
       await runner2.commitTransaction();
     } catch (err: unknown) {
@@ -135,10 +144,9 @@ export class PlanningService {
         `Could not save webhook for request ${processingRequest.id}. ${message}`,
       );
 
-      await this.dataSource.query(
-        `UPDATE routing_requests SET status = $1, updated_at = NOW() WHERE id = $2`,
-        [RoutingStatus.FAILED, processingRequest.id],
-      );
+      await this.requestsRepo.update(processingRequest.id, {
+        status: RoutingStatus.FAILED,
+      });
     } finally {
       await runner2.release();
     }

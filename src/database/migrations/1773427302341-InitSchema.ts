@@ -33,6 +33,7 @@ export class InitSchema1710000000000 implements MigrationInterface {
                 status webhook_status NOT NULL DEFAULT 'PENDING',
                 retry_count INT NOT NULL DEFAULT 0,
                 next_attempt_at TIMESTAMPTZ NOT NULL,
+                last_attempt_at TIMESTAMPTZ,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
             
