@@ -7,8 +7,7 @@ import { PlanningModule } from './planning/planning.module';
 import { DispatchModule } from './dispatch/dispatch.module';
 import { DatabaseModule } from './database/database.module';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { AppService } from './app.service';
     DispatchModule,
     DatabaseModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [HealthController],
 })
 export class AppModule {}

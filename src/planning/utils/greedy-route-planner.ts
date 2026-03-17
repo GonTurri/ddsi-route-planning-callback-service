@@ -14,6 +14,7 @@ export interface Delivery {
   deliveryCode: string;
   lat: number;
   lon: number;
+  address: string;
   weightKg: number;
   volumeM3: number;
 }

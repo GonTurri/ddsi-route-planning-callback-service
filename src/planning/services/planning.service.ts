@@ -88,6 +88,7 @@ export class PlanningService {
             deliveryCode: d.deliveryCode,
             lat: d.latitude,
             lon: d.longitude,
+            address: d.address,
             weightKg: d.WeightKg,
             volumeM3: d.VolumeM3,
           })),

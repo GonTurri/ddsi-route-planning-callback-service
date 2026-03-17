@@ -31,6 +31,14 @@ export class DeliveryDto {
   @IsNotEmpty()
   longitude: number;
 
+  @ApiProperty({
+    example: 'Av. Libertador 5000, CABA',
+    description: 'Direccion de entrega',
+  })
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
   @ApiProperty({ example: 25.5, description: 'Peso en kg' })
   @IsNumber()
   @IsNotEmpty()

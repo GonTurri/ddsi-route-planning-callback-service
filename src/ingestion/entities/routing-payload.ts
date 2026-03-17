@@ -8,6 +8,7 @@ export interface DeliveryInfo {
   deliveryCode: string;
   latitude: number;
   longitude: number;
+  address: string;
   WeightKg: number;
   VolumeM3: number;
 }

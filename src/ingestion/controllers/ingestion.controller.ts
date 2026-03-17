@@ -32,7 +32,45 @@ export class IngestionController {
 
   @Post()
   @HttpCode(202)
-  @ApiOperation({ summary: 'Solicitar planificacion de rutas' })
+  @ApiOperation({
+    summary: 'Solicitar planificación de rutas (Asíncrono)',
+    description: `
+Recibe un listado de entregas y camiones para calcular las rutas óptimas. El procesamiento es asíncrono.
+
+### 🪝 Webhook Callback (Notificación de finalización)
+Una vez que el motor matemático termine el cálculo (o falle), nuestro \`DispatchService\` enviará un \`POST\` a la URL (\`callbackUrl\`) que configuraste para tu grupo.
+
+#### 🛡️ Seguridad (Verificación de Firma)
+El webhook incluye un header llamado \`X-Signature\`. Debes generar un HMAC SHA-256 del cuerpo (body) crudo de la petición usando tu \`clientSecret\` y comparar ambas firmas para asegurar que la petición proviene de nuestro motor y no de un tercero malicioso.
+
+#### 📦 Payload de Ejemplo (Cuerpo de la petición que recibirás)
+\`\`\`json
+{
+  "event_id": "evt_7b92a1...",
+  "event_type": "routing.completed",
+  "request_id": "123e4567-e89b-12d3-a456-425614134023",
+  "timestamp": "2026-03-18T08:05:00Z",
+  "data": {
+    "routes": [
+      {
+        "truckId": "CAMION-CHICO",
+        "assignedRouteId": "ROUTE-74EA598C",
+        "estimatedStartTime": "2026-03-18T08:00:00.000Z",
+        "estimatedEndTime": "2026-03-18T08:47:00.000Z",
+        "totalDistanceKm": 8.27,
+        "totalDurationMins": 47,
+        "stops": [ ... ]
+      }
+    ],
+    "unassignedDeliveries": []
+  }
+}
+\`\`\`
+
+#### ⏱️ Expectativas de Respuesta
+Tu servidor debe responder al webhook con un código HTTP \`200 OK\` en menos de **5 segundos**. Si tardas más, asumiremos que hubo un error y reintentaremos el envíoz.
+    `,
+  })
   @ApiResponse({
     status: 202,
     description: 'Solicitud aceptada para procesamiento',

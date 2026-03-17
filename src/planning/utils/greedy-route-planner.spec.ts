@@ -28,6 +28,7 @@ function makeDelivery(
   return {
     lat: warehouse.lat,
     lon: warehouse.lon,
+    address: 'Av ejemplo 550',
     weightKg: 10,
     volumeM3: 1,
     ...overrides,
