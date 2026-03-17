@@ -18,7 +18,13 @@ export interface TruckInfo {
   VolumeCapacityM3: number;
 }
 
+export interface TimeWindowInfo {
+  start: string;
+  end: string;
+}
+
 export interface RoutingPayload {
+  timeWindow: TimeWindowInfo;
   warehouse: WarehouseInfo;
   deliveries: DeliveryInfo[];
   trucks: TruckInfo[];

@@ -7,6 +7,9 @@ class StopDto {
 
   @ApiProperty({ example: 'ENT-001' })
   deliveryCode: string;
+
+  @ApiProperty({ example: '2025-09-21T09:25:00Z' })
+  estimatedArrivalTime: string;
 }
 
 class RouteResultDto {
@@ -15,6 +18,18 @@ class RouteResultDto {
 
   @ApiProperty({ example: 'route_74ea598c-eeac-46b6-8166-e7ee784a8ac8' })
   assignedRouteId: string;
+
+  @ApiProperty({ example: '2025-09-21T09:00:00Z' })
+  estimatedStartTime: string;
+
+  @ApiProperty({ example: '2025-09-21T13:30:00Z' })
+  estimatedEndTime: string;
+
+  @ApiProperty({ example: 26.4 })
+  totalDistanceKm: number;
+
+  @ApiProperty({ example: 270 })
+  totalDurationMins: number;
 
   @ApiProperty({ type: [StopDto] })
   stops: StopDto[];

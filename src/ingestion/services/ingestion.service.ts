@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoutingRequest } from '../entities/routing-request.entity';
@@ -6,6 +10,7 @@ import { PlanRouteDto } from '../dtos/request/plan-route.dto';
 import { PlanRouteResponseDto } from '../dtos/response/plan-route-response.dto';
 import { RoutingStatus } from '../entities/routing-status.enum';
 import { WebhookOutbox } from '../../dispatch/entities/webhook-outbox.entity';
+import { TimeWindowDto } from '../dtos/request/time-window.dto';
 import { GetRouteStatusResponseDto } from '../dtos/response/get-route-response.dto';
 
 @Injectable()
@@ -18,10 +23,40 @@ export class IngestionService {
     private readonly outboxRepo: Repository<WebhookOutbox>,
   ) {}
 
+  private validateTimeWindow(timeWindow: TimeWindowDto): void {
+    if (!timeWindow || !timeWindow.start || !timeWindow.end) {
+      throw new BadRequestException(
+        'Falta la información de la ventana horaria (start y end).',
+      );
+    }
+
+    const start = new Date(timeWindow.start);
+    const end = new Date(timeWindow.end);
+
+    if (start >= end) {
+      throw new BadRequestException(
+        'La fecha "hasta" debe ser posterior a la fecha "desde" en la ventana horaria.',
+      );
+    }
+
+    const isSameDay =
+      start.getFullYear() === end.getFullYear() &&
+      start.getMonth() === end.getMonth() &&
+      start.getDate() === end.getDate();
+
+    if (!isSameDay) {
+      throw new BadRequestException(
+        'La jornada operativa de los camiones debe comenzar y terminar en el mismo día.',
+      );
+    }
+  }
+
   async saveRoutingRequest(
     dto: PlanRouteDto,
     groupId: string,
   ): Promise<PlanRouteResponseDto> {
+    this.validateTimeWindow(dto.timeWindow);
+
     const existing = await this.requestsRepo.findOneBy({ id: dto.requestId });
     if (existing) {
       return { requestId: existing.id, status: existing.status };
@@ -31,6 +66,7 @@ export class IngestionService {
       id: dto.requestId,
       groupId: groupId,
       payload: {
+        timeWindow: dto.timeWindow,
         warehouse: dto.warehouse,
         deliveries: dto.deliveries,
         trucks: dto.trucks,

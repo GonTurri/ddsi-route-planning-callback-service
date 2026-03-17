@@ -78,6 +78,7 @@ export class PlanningService {
       const payload = processingRequest.payload;
 
       routePlanningResult = await this.vrpWorker.run(
+        payload.timeWindow,
         {
           lat: payload.warehouse.latitude,
           lon: payload.warehouse.longitude,
