@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -59,6 +60,12 @@ export class IngestionService {
 
     const existing = await this.requestsRepo.findOneBy({ id: dto.requestId });
     if (existing) {
+      if (existing.groupId !== groupId) {
+        throw new ConflictException(
+          'El requestId proporcionado ya se encuentra en uso. Por favor, genera un nuevo UUID.',
+        );
+      }
+
       return { requestId: existing.id, status: existing.status };
     }
 

@@ -22,6 +22,7 @@ import { PlanRouteDto } from '../dtos/request/plan-route.dto';
 import { PlanRouteResponseDto } from '../dtos/response/plan-route-response.dto';
 import { GetRouteStatusResponseDto } from '../dtos/response/get-route-response.dto';
 import { StudentGroup } from '../../groups/entities/student-group.entity';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Plan Route')
 @ApiBearerAuth()
@@ -31,6 +32,7 @@ export class IngestionController {
   constructor(private readonly ingestionService: IngestionService) {}
 
   @Post()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @HttpCode(202)
   @ApiOperation({
     summary: 'Solicitar planificación de rutas (Asíncrono)',
