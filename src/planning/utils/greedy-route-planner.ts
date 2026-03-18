@@ -1,3 +1,4 @@
+import { TruckInfo } from 'src/shared/types/truck-info.interface';
 import { haversine } from './haversine';
 import { randomUUID } from 'crypto';
 
@@ -17,12 +18,6 @@ export interface Delivery {
   address: string;
   weightKg: number;
   volumeM3: number;
-}
-
-export interface Truck {
-  truckId: string;
-  weightCapacityKg: number;
-  volumeCapacityM3: number;
 }
 
 export interface Warehouse {
@@ -97,7 +92,7 @@ function findNearestFittingDeliveryIndex(
 }
 
 function buildRouteForTruck(
-  truck: Truck,
+  truck: TruckInfo,
   warehouse: Warehouse,
   timeWindow: TimeWindow,
   unassignedPool: Delivery[],
@@ -199,7 +194,7 @@ export function planRoutes(
   timeWindow: TimeWindow,
   warehouse: Warehouse,
   deliveries: Delivery[],
-  trucks: Truck[],
+  trucks: TruckInfo[],
 ): PlanningResult {
   const unassignedPool = [...deliveries];
   const routes: RouteResult[] = [];

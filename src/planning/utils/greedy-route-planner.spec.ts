@@ -2,9 +2,9 @@ import {
   planRoutes,
   Warehouse,
   Delivery,
-  Truck,
   TimeWindow,
 } from './greedy-route-planner';
+import { TruckInfo } from 'src/shared/types/truck-info.interface';
 
 const warehouse: Warehouse = {
   lat: -34.6037,
@@ -18,7 +18,9 @@ const timeWindow: TimeWindow = {
   end: '2025-09-21T17:00:00Z',
 };
 
-function makeTruck(overrides: Partial<Truck> & { truckId: string }): Truck {
+function makeTruck(
+  overrides: Partial<TruckInfo> & { truckId: string },
+): TruckInfo {
   return { weightCapacityKg: 1000, volumeCapacityM3: 10, ...overrides };
 }
 
@@ -43,7 +45,7 @@ describe('Greedy Route Planner', () => {
       makeDelivery({ deliveryCode: 'D1', lat: -34.61, lon: -58.38 }),
       makeDelivery({ deliveryCode: 'D2', lat: -34.62, lon: -58.39 }),
     ];
-    const trucks: Truck[] = [
+    const trucks: TruckInfo[] = [
       makeTruck({ truckId: 'T1', weightCapacityKg: 500, volumeCapacityM3: 50 }),
     ];
 
@@ -64,7 +66,7 @@ describe('Greedy Route Planner', () => {
       makeDelivery({ deliveryCode: 'D2', weightKg: 100 }),
       makeDelivery({ deliveryCode: 'D3', weightKg: 100 }),
     ];
-    const trucks: Truck[] = [
+    const trucks: TruckInfo[] = [
       makeTruck({ truckId: 'T1', weightCapacityKg: 50, volumeCapacityM3: 50 }),
     ];
 
@@ -83,7 +85,7 @@ describe('Greedy Route Planner', () => {
     const deliveries: Delivery[] = [
       makeDelivery({ deliveryCode: 'PLUMAS', weightKg: 1, volumeM3: 10 }),
     ];
-    const trucks: Truck[] = [
+    const trucks: TruckInfo[] = [
       makeTruck({ truckId: 'T1', weightCapacityKg: 1000, volumeCapacityM3: 5 }),
     ];
 
@@ -98,7 +100,7 @@ describe('Greedy Route Planner', () => {
     const deliveries: Delivery[] = [
       makeDelivery({ deliveryCode: 'PLOMO', weightKg: 500, volumeM3: 0.1 }),
     ];
-    const trucks: Truck[] = [
+    const trucks: TruckInfo[] = [
       makeTruck({ truckId: 'T1', weightCapacityKg: 100, volumeCapacityM3: 50 }),
     ];
 
@@ -116,7 +118,7 @@ describe('Greedy Route Planner', () => {
       makeDelivery({ deliveryCode: 'LEJOS', lat: -34.7, lon: -58.38 }),
       makeDelivery({ deliveryCode: 'CERCA', lat: -34.61, lon: -58.38 }),
     ];
-    const trucks: Truck[] = [
+    const trucks: TruckInfo[] = [
       makeTruck({
         truckId: 'T1',
         weightCapacityKg: 10000,
@@ -146,7 +148,7 @@ describe('Greedy Route Planner', () => {
   });
 
   it('devuelve todo vacío cuando no hay entregas', () => {
-    const trucks: Truck[] = [makeTruck({ truckId: 'T1' })];
+    const trucks: TruckInfo[] = [makeTruck({ truckId: 'T1' })];
 
     const result = planRoutes(timeWindow, warehouse, [], trucks);
 
@@ -162,7 +164,7 @@ describe('Greedy Route Planner', () => {
       makeDelivery({ deliveryCode: 'D2', weightKg: 80 }),
       makeDelivery({ deliveryCode: 'D3', weightKg: 80 }),
     ];
-    const trucks: Truck[] = [
+    const trucks: TruckInfo[] = [
       makeTruck({
         truckId: 'T1',
         weightCapacityKg: 100,
@@ -188,7 +190,7 @@ describe('Greedy Route Planner', () => {
     const deliveries: Delivery[] = [
       makeDelivery({ deliveryCode: 'MUY-LEJOS', lat: -38.0, lon: -58.38 }),
     ];
-    const trucks: Truck[] = [
+    const trucks: TruckInfo[] = [
       makeTruck({
         truckId: 'T1',
         weightCapacityKg: 5000,
@@ -213,7 +215,7 @@ describe('Greedy Route Planner', () => {
         lon: -58.3816,
       }),
     ];
-    const trucks: Truck[] = [makeTruck({ truckId: 'T1' })];
+    const trucks: TruckInfo[] = [makeTruck({ truckId: 'T1' })];
 
     const result = planRoutes(timeWindow, warehouse, deliveries, trucks);
 
@@ -235,7 +237,7 @@ describe('Greedy Route Planner', () => {
       makeDelivery({ deliveryCode: 'P1', lat: -34.61, lon: -58.38 }),
       makeDelivery({ deliveryCode: 'P2', lat: -34.62, lon: -58.39 }),
     ];
-    const trucks: Truck[] = [makeTruck({ truckId: 'T1' })];
+    const trucks: TruckInfo[] = [makeTruck({ truckId: 'T1' })];
 
     const result = planRoutes(timeWindow, warehouse, deliveries, trucks);
 

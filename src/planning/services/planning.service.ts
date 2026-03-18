@@ -92,11 +92,7 @@ export class PlanningService {
             weightKg: d.WeightKg,
             volumeM3: d.VolumeM3,
           })),
-          payload.trucks.map((t) => ({
-            truckId: t.truckId,
-            weightCapacityKg: t.WeightCapacityKg,
-            volumeCapacityM3: t.VolumeCapacityM3,
-          })),
+          payload.trucks,
         );
       } catch (workerErr) {
         this.logger.error(

@@ -1,3 +1,5 @@
+import { TruckInfo } from 'src/shared/types/truck-info.interface';
+
 export interface WarehouseInfo {
   latitude: number;
   longitude: number;
@@ -11,12 +13,6 @@ export interface DeliveryInfo {
   address: string;
   WeightKg: number;
   VolumeM3: number;
-}
-
-export interface TruckInfo {
-  truckId: string;
-  WeightCapacityKg: number;
-  VolumeCapacityM3: number;
 }
 
 export interface TimeWindowInfo {
