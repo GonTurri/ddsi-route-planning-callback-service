@@ -32,4 +32,16 @@ export class RoutingRequest {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  isCompleted(): boolean {
+    return this.status === RoutingStatus.COMPLETED;
+  }
+
+  isFailed(): boolean {
+    return this.status === RoutingStatus.FAILED;
+  }
+
+  isPending(): boolean {
+    return this.status === RoutingStatus.PENDING;
+  }
 }

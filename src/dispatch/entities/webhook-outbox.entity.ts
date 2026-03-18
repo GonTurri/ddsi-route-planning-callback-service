@@ -1,5 +1,13 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { WebhookStatus } from './webhook-status.enum';
+import { RoutingRequest } from 'src/ingestion/entities/routing-request.entity';
 
 //? DOCS: webhookOutBox nos permite almacenar los webhooks que tenemos que enviar a los clientes,
 //?  con su status de entrega, para luego tener un proceso que se encargue de reintentar
@@ -12,7 +20,10 @@ export class WebhookOutbox {
   @PrimaryColumn('uuid')
   id: string;
 
-  //TODO: cambiar a many to one??
+  @OneToOne(() => RoutingRequest, { eager: false })
+  @JoinColumn({ name: 'request_id', referencedColumnName: 'id' })
+  routingRequest: RoutingRequest;
+
   @Column({ name: 'request_id', type: 'uuid' })
   requestId: string;
 

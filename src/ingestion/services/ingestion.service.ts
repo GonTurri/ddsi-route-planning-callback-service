@@ -13,6 +13,7 @@ import { RoutingStatus } from '../entities/routing-status.enum';
 import { WebhookOutbox } from '../../dispatch/entities/webhook-outbox.entity';
 import { TimeWindowDto } from '../dtos/request/time-window.request.dto';
 import { GetRouteStatusResponseDto } from '../dtos/response/get-route.response.dto';
+import { isSameDay } from '../utils/is-same-day.util';
 
 @Injectable()
 export class IngestionService {
@@ -40,12 +41,7 @@ export class IngestionService {
       );
     }
 
-    const isSameDay =
-      start.getFullYear() === end.getFullYear() &&
-      start.getMonth() === end.getMonth() &&
-      start.getDate() === end.getDate();
-
-    if (!isSameDay) {
+    if (!isSameDay(start, end)) {
       throw new BadRequestException(
         'La jornada operativa de los camiones debe comenzar y terminar en el mismo día.',
       );
@@ -107,7 +103,7 @@ export class IngestionService {
       updatedAt: request.updatedAt,
     };
 
-    if (request.status === RoutingStatus.COMPLETED) {
+    if (request.isCompleted()) {
       const outboxEntry = await this.outboxRepo.findOneBy({
         requestId: request.id,
       });
@@ -123,7 +119,7 @@ export class IngestionService {
       }
     }
 
-    if (request.status === RoutingStatus.FAILED) {
+    if (request.isFailed()) {
       response.error =
         'La planificacion de rutas fallo debido a un error matematico o datos invalidos.';
     }
