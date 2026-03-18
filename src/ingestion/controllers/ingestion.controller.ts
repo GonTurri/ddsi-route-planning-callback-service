@@ -5,9 +5,11 @@ import {
   Post,
   Get,
   Param,
+  Res,
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import {
   ApiTags,
   ApiParam,
@@ -37,7 +39,6 @@ export class IngestionController {
 
   @Post()
   @Throttle({ default: { limit: 10, ttl: 60000 } })
-  @HttpCode(202)
   @ApiOperation({
     summary: planRouteDocs.summary,
     description: planRouteDocs.description,
@@ -47,16 +48,26 @@ export class IngestionController {
     description: planRouteDocs.responses.accepted,
     type: PlanRouteResponseDto,
   })
+  @ApiResponse({
+    status: 200,
+    description: 'Solicitud ya existente, se devuelve su estado actual',
+    type: PlanRouteResponseDto,
+  })
   @ApiResponse({ status: 400, description: planRouteDocs.responses.badRequest })
   @ApiResponse({
     status: 401,
     description: planRouteDocs.responses.unauthorized,
   })
-  planRoute(
+  async planRoute(
     @Body() dto: PlanRouteDto,
     @CurrentGroup() group: StudentGroup,
-  ): Promise<PlanRouteResponseDto> {
-    return this.ingestionService.saveRoutingRequest(dto, group.id);
+    @Res() res: Response,
+  ): Promise<void> {
+    const { data, created } = await this.ingestionService.saveRoutingRequest(
+      dto,
+      group.id,
+    );
+    res.status(created ? 202 : 200).json(data);
   }
 
   @Get(':id')

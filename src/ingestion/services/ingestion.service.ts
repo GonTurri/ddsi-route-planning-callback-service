@@ -51,7 +51,7 @@ export class IngestionService {
   async saveRoutingRequest(
     dto: PlanRouteDto,
     groupId: string,
-  ): Promise<PlanRouteResponseDto> {
+  ): Promise<{ data: PlanRouteResponseDto; created: boolean }> {
     this.validateTimeWindow(dto.timeWindow);
 
     const existing = await this.requestsRepo.findOneBy({ id: dto.requestId });
@@ -62,7 +62,10 @@ export class IngestionService {
         );
       }
 
-      return { requestId: existing.id, status: existing.status };
+      return {
+        data: { requestId: existing.id, status: existing.status },
+        created: false,
+      };
     }
 
     const request = this.requestsRepo.create({
@@ -78,7 +81,10 @@ export class IngestionService {
     });
     const saved = await this.requestsRepo.save(request);
 
-    return { requestId: saved.id, status: saved.status };
+    return {
+      data: { requestId: saved.id, status: saved.status },
+      created: true,
+    };
   }
 
   async getRoutingStatus(
