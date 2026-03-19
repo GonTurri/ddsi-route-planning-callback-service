@@ -15,6 +15,7 @@ services:
       retries: 5
     networks:
       - route-network
+      - dokploy-network
 
 
   migrator:
@@ -126,3 +127,5 @@ volumes:
 networks:
   route-network:
     driver: bridge
+  dokploy-network:
+    external: true  
