@@ -5,7 +5,13 @@ import { Logger } from '@nestjs/common';
 async function bootstrap() {
   const logger = new Logger('WorkerDispatchBootstrap');
 
-  const app = await NestFactory.createApplicationContext(DispatchModule);
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  const app = await NestFactory.createApplicationContext(DispatchModule, {
+    logger: isProduction
+      ? ['log', 'error', 'warn']
+      : ['log', 'error', 'warn', 'debug', 'verbose'],
+  });
 
   await app.init();
 

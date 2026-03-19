@@ -7,7 +7,13 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { json, urlencoded } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: isProduction
+      ? ['log', 'error', 'warn']
+      : ['log', 'error', 'warn', 'debug', 'verbose'],
+  });
 
   app.set('trust proxy', 1);
 
