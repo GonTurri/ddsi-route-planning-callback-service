@@ -21,7 +21,7 @@ export class TruckDto {
       'La capacidad de peso (WeightCapacityKg) del camión debe ser mayor a 0',
   })
   @IsNotEmpty()
-  WeightCapacityKg: number;
+  weightCapacityKg: number;
 
   @ApiProperty({
     example: 10,
@@ -34,5 +34,5 @@ export class TruckDto {
       'La capacidad de volumen (VolumeCapacityM3) del camión debe ser mayor a 0',
   })
   @IsNotEmpty()
-  VolumeCapacityM3: number;
+  volumeCapacityM3: number;
 }

@@ -1,6 +1,4 @@
 services:
-
-# TODO: hardcodear credenciales db para alumnos
   db:
     image: postgres:16-alpine
     container_name: route_generator_db
@@ -22,23 +20,7 @@ services:
       retries: 5
     networks:
       - route-network
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: route_generator_pgadmin
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - route-network
   
-  #TODO: app port en .env
   api:
     build:
       context: .

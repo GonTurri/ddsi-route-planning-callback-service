@@ -18,6 +18,9 @@ import { envConfig } from '../config/env.config';
       synchronize: false,
       migrations: [__dirname + '/migrations/*{.ts,.js}'],
       migrationsRun: true,
+      extra: {
+        max: envConfig.db.poolSize,
+      },
     }),
   ],
 })

@@ -19,6 +19,7 @@ export class VrpWorkerService implements OnModuleDestroy {
   ): Promise<PlanningResult> {
     return new Promise((resolve, reject) => {
       const workerPath = path.join(__dirname, '..', 'utils', 'vrp.worker.js');
+      console.log(`Trucks... ${trucks.length}`);
       const worker = new Worker(workerPath, {
         workerData: { timeWindow, warehouse, deliveries, trucks },
       });

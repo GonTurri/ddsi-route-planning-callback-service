@@ -14,6 +14,7 @@ import { WebhookOutbox } from '../../dispatch/entities/webhook-outbox.entity';
 import { TimeWindowDto } from '../dtos/request/time-window.request.dto';
 import { GetRouteStatusResponseDto } from '../dtos/response/get-route.response.dto';
 import { isSameDay } from '../utils/is-same-day.util';
+import { RoutingCacheService } from './routing-cache.service';
 
 @Injectable()
 export class IngestionService {
@@ -23,6 +24,8 @@ export class IngestionService {
 
     @InjectRepository(WebhookOutbox)
     private readonly outboxRepo: Repository<WebhookOutbox>,
+
+    private readonly routingCache: RoutingCacheService,
   ) {}
 
   private validateTimeWindow(timeWindow: TimeWindowDto): void {
@@ -91,6 +94,9 @@ export class IngestionService {
     requestId: string,
     groupId: string,
   ): Promise<GetRouteStatusResponseDto> {
+    const cached = await this.routingCache.getRouteStatus(requestId, groupId);
+    if (cached) return cached;
+
     const request = await this.requestsRepo.findOneBy({
       id: requestId,
       groupId: groupId,
@@ -115,8 +121,7 @@ export class IngestionService {
       });
 
       if (
-        outboxEntry &&
-        outboxEntry.payload &&
+        outboxEntry?.payload &&
         typeof outboxEntry.payload === 'object' &&
         'data' in outboxEntry.payload
       ) {
@@ -128,6 +133,10 @@ export class IngestionService {
     if (request.isFailed()) {
       response.error =
         'La planificacion de rutas fallo debido a un error matematico o datos invalidos.';
+    }
+
+    if (request.isCompleted() || request.isFailed()) {
+      await this.routingCache.setRouteStatus(requestId, groupId, response);
     }
 
     return response;
