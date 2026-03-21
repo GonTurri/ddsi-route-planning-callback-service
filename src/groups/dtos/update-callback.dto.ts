@@ -6,7 +6,7 @@ export class UpdateCallbackDto {
     example: 'https://api.miproyecto.com/v1/webhook',
     description: 'Nueva URL de callback',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'La URL de callback no puede estar vacío.' })
   @IsUrl(
     { require_protocol: true, protocols: ['https'] },
     { message: 'La URL de callback debe ser válida y utilizar HTTPS.' },

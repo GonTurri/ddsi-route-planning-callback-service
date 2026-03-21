@@ -23,7 +23,7 @@ export class ApiKeyGuard implements CanActivate {
 
     if (!authHeader?.startsWith('Bearer ')) {
       throw new UnauthorizedException(
-        'Missing or invalid Authorization header',
+        'Falta el encabezado Authorization o el formato es incorrecto (debe ser Bearer token)',
       );
     }
 
@@ -31,13 +31,15 @@ export class ApiKeyGuard implements CanActivate {
     const apiKey = authHeader.slice(7);
 
     if (!isUUID(apiKey)) {
-      throw new UnauthorizedException('Invalid API key format');
+      throw new UnauthorizedException(
+        'El formato de la API key es inválido (debe ser un UUID)',
+      );
     }
 
     const group = await this.groupsService.findByApiKey(apiKey);
 
     if (!group) {
-      throw new UnauthorizedException('Invalid API key');
+      throw new UnauthorizedException('API key inválida o grupo no registrado');
     }
 
     request.group = group;
