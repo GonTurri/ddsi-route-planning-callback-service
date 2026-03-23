@@ -115,27 +115,31 @@ export class IngestionService {
       updatedAt: request.updatedAt,
     };
 
-    if (request.isCompleted()) {
+    if (request.isCompleted() || request.isFailed()) {
       const outboxEntry = await this.outboxRepo.findOneBy({
         requestId: request.id,
       });
 
-      if (
-        outboxEntry?.payload &&
-        typeof outboxEntry.payload === 'object' &&
-        'data' in outboxEntry.payload
-      ) {
-        response.result = outboxEntry.payload
-          .data as GetRouteStatusResponseDto['result'];
+      if (outboxEntry?.payload && typeof outboxEntry.payload === 'object') {
+        if (request.isCompleted() && 'data' in outboxEntry.payload) {
+          response.result = outboxEntry.payload
+            .data as GetRouteStatusResponseDto['result'];
+        }
+
+        if (request.isFailed() && 'error' in outboxEntry.payload) {
+          response.error = outboxEntry.payload
+            .error as GetRouteStatusResponseDto['error'];
+        }
       }
-    }
 
-    if (request.isFailed()) {
-      response.error =
-        'La planificacion de rutas fallo debido a un error matematico o datos invalidos.';
-    }
+      if (request.isFailed() && !response.error) {
+        response.error = {
+          code: 'UNKNOWN_ERROR',
+          message:
+            'La planificación falló por un error interno antes de generar el reporte.',
+        };
+      }
 
-    if (request.isCompleted() || request.isFailed()) {
       await this.routingCache.setRouteStatus(requestId, groupId, response);
     }
 

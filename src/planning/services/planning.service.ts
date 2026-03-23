@@ -88,7 +88,10 @@ export class PlanningService {
     for (const request of processingRequests) {
       this.logger.log(`[REQ: ${request.id}] Iniciando cálculo matemático...`);
       const startTime = performance.now();
+
       let routePlanningResult: PlanningResult | null = null;
+      let routingFailed = false;
+      let errorMessage = '';
 
       try {
         const payload = request.payload;
@@ -120,10 +123,11 @@ export class PlanningService {
           `[REQ: ${request.id}] Excepción lanzada por el motor matemático.`,
           mathErr,
         );
-        await this.requestsRepo.update(request.id, {
-          status: RoutingStatus.FAILED,
-        });
-        continue;
+        routingFailed = true;
+        errorMessage =
+          mathErr instanceof Error
+            ? mathErr.message
+            : 'Error matemático desconocido';
       }
 
       const saveRunner = this.dataSource.createQueryRunner();
@@ -131,21 +135,39 @@ export class PlanningService {
       await saveRunner.startTransaction();
 
       try {
+        const newStatus = routingFailed
+          ? RoutingStatus.FAILED
+          : RoutingStatus.COMPLETED;
         this.logger.debug(
-          `[REQ: ${request.id}] Guardando estado COMPLETED y encolando webhook...`,
+          `[REQ: ${request.id}] Guardando estado ${newStatus} y encolando webhook...`,
         );
 
         await saveRunner.manager.update(RoutingRequest, request.id, {
-          status: RoutingStatus.COMPLETED,
+          status: newStatus,
         });
 
-        const outboxPayload = {
-          event_id: `evt_${randomUUID()}`,
-          event_type: 'routing.completed',
-          request_id: request.id,
-          timestamp: new Date().toISOString(),
-          data: routePlanningResult,
-        };
+        let outboxPayload: Record<string, any>;
+
+        if (routingFailed) {
+          outboxPayload = {
+            event_id: `evt_${randomUUID()}`,
+            event_type: 'routing.failed',
+            request_id: request.id,
+            timestamp: new Date().toISOString(),
+            error: {
+              code: 'UNPROCESSABLE_ROUTE',
+              message: errorMessage,
+            },
+          };
+        } else {
+          outboxPayload = {
+            event_id: `evt_${randomUUID()}`,
+            event_type: 'routing.completed',
+            request_id: request.id,
+            timestamp: new Date().toISOString(),
+            data: routePlanningResult,
+          };
+        }
 
         const newOutboxEntry = saveRunner.manager.create(WebhookOutbox, {
           id: randomUUID(),
@@ -160,7 +182,7 @@ export class PlanningService {
         await saveRunner.manager.save(newOutboxEntry);
         await saveRunner.commitTransaction();
         this.logger.log(
-          `[REQ: ${request.id}] Procesamiento exitoso. Webhook listo para dispatch.`,
+          `[REQ: ${request.id}] Procesamiento registrado. Webhook listo para dispatch.`,
         );
       } catch (err: unknown) {
         await saveRunner.rollbackTransaction();
