@@ -7,7 +7,7 @@ export const ingestionApiDocs = {
       'El procesamiento de la solicitud se realiza de forma asíncrona.',
       '',
       '### Webhook Callback (Notificación de finalización)',
-      'Una vez que el motor matemático finalice el cálculo (o falle), el servicio `DispatchService` enviará una solicitud HTTP al endpoint configurado.',
+      'Una vez que el motor matemático finalice el cálculo (o falle), se enviará una solicitud HTTP al endpoint configurado.',
       '',
       '```http',
       'POST <callbackUrl>',
