@@ -82,18 +82,18 @@ Para garantizar que la petición proviene de nuestro motor y no de un tercero ma
 Tu servidor debe responder al webhook con un código HTTP \`200 OK\` en menos de **5 segundos**.
     `,
     responses: {
-      accepted: 'Solicitud aceptada para procesamiento',
-      badRequest: 'Datos de solicitud invalidos',
-      unauthorized: 'API key invalida o ausente',
+      accepted: 'Solicitud aceptada para ser procesada',
+      badRequest: 'Datos de solicitud inválidos',
+      unauthorized: 'API key inválida o ausente',
     },
   },
   getPlannedRoute: {
-    summary: 'Consultar el estado y resultado de una planificacion (Polling)',
+    summary: 'Consultar el estado y resultado de una planificación (Polling)',
     paramDescription: 'ID de la solicitud (requestId)',
     responses: {
-      ok: 'Estado actual de la solicitud y sus resultados si finalizo',
+      ok: 'Estado actual de la solicitud. Devuelve sus resultados si finalizó',
       notFound: 'Solicitud no encontrada o no pertenece a tu grupo',
-      unauthorized: 'API key invalida o ausente',
+      unauthorized: 'API key inválida o ausente',
     },
   },
 };

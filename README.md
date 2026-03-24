@@ -8,9 +8,9 @@ Calcular rutas matemáticas óptimas es un proceso intensivo a nivel de CPU (NP-
 
 El flujo de trabajo principal no es bloqueante:
 
-1. Envías la solicitud: Le entregas los datos al motor.
+1. Enviás la solicitud: Le entregas los datos al motor.
 
-2. Recibes un Ticket: El servidor responde instantáneamente con un código 202 Accepted y un requestId. El cálculo entra a una cola de procesamiento en segundo plano.
+2. Recibís un Ticket: El servidor responde instantáneamente con un código 202 Accepted y un requestId. El cálculo entra a una cola de procesamiento en segundo plano.
 
 3. Notificación (Webhook): Una vez que el motor termina los cálculos, te enviamos el resultado de vuelta a tu servidor.
 
@@ -18,11 +18,11 @@ El flujo de trabajo principal no es bloqueante:
 Existen dos formas de interactuar con el motor para obtener los resultados de tus rutas. Te recomendamos implementar el flujo por Webhook para un diseño de sistema más moderno y eficiente.
 
 ## Opción A: Webhook (Recomendado)
-Un webhook es un "callback HTTP". En lugar de que tú nos preguntes repetidamente si el cálculo terminó, **nosotros te avisamos**.
+Un webhook es un "callback HTTP". En lugar de que nos preguntes repetidamente si el cálculo terminó, **nosotros te avisamos**.
 
 1. Registras la URL de tu servidor mediante el endpoint POST /groups/register.
 
-2. Envías tu solicitud de ruteo al motor.
+2. Enviás tu solicitud de ruteo al motor.
 
 3. Cuando el motor finaliza, hace un POST a tu URL con los resultados de las rutas asignadas.
 
@@ -33,9 +33,9 @@ Un webhook es un "callback HTTP". En lugar de que tú nos preguntes repetidament
 ## Opción B: Polling (Alternativa)
 Si por cuestiones de infraestructura no puedes exponer un endpoint público para recibir webhooks, puedes consultar activamente el estado de tu solicitud.
 
-1. Envías la solicitud de ruteo y guardas el requestId.
+1. Enviás la solicitud de ruteo y guardas el requestId.
 
-2. Realizas peticiones periódicas (ej: cada 10 segundos) a GET /plan-route/{requestId}.
+2. Hacés peticiones periódicas (ej: cada 10 segundos) a GET /plan-route/{requestId}.
 
 3. El motor te responderá con estado PENDING hasta que el cálculo finalice, momento en el cual el estado cambiará a COMPLETED y adjuntará el resultado.
 
@@ -43,9 +43,9 @@ Si por cuestiones de infraestructura no puedes exponer un endpoint público para
 Para asegurar que tu sistema se integre de forma robusta con el motor, te recomendamos seguir estos principios de diseño:
 
 ### 1. Idempotencia y Reintentos
-Las redes son inestables. ¿Qué pasa si envías una solicitud de ruteo y tu conexión a internet se corta antes de recibir la respuesta?
+Las redes son inestables. ¿Qué pasa si enviás una solicitud de ruteo y tu conexión a internet se corta antes de recibir la respuesta?
 
-Nuestra API es idempotente gracias al uso del requestId (UUID). Si no estás seguro de si recibimos tu solicitud, vuelve a enviarla exactamente con el mismo JSON y el mismo requestId.
+Nuestra API es idempotente gracias al uso del requestId (UUID). Si no estás seguro de si recibimos tu solicitud, volvé a enviarla exactamente con el mismo JSON y el mismo requestId.
 
 Si no la teníamos, la encolaremos.
 

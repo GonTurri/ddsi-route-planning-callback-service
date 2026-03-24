@@ -31,7 +31,10 @@ export class GroupsController {
   @Throttle({ default: { limit: 5, ttl: 3600000 } })
   //ttl = 3600000 ms = 1 hora, limit = 5 registros por hora para evitar abusos
   @HttpCode(201)
-  @ApiOperation({ summary: 'Registrar un nuevo grupo' })
+  @ApiOperation({
+    summary:
+      'Registrá el nombre de tu grupo y tu url de callback (url de tu aplicación a donde serán enviadas las rutas una vez estén listas)',
+  })
   @ApiResponse({
     status: 201,
     description: 'Grupo registrado exitosamente',
