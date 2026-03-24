@@ -119,7 +119,8 @@ export const ingestionApiDocs = {
       'La respuesta debe enviarse en menos de **5 segundos** para confirmar la recepción del evento.',
     ].join('\n'),
     responses: {
-      accepted: 'Solicitud aceptada para procesamiento',
+      accepted: 'Solicitud aceptada para ser procesada',
+
       badRequest: 'Datos de solicitud inválidos',
       unauthorized: 'API key inválida o ausente',
     },
@@ -129,7 +130,7 @@ export const ingestionApiDocs = {
     summary: 'Consultar el estado y resultado de una planificación (Polling)',
     paramDescription: 'ID de la solicitud (requestId)',
     responses: {
-      ok: 'Estado actual de la solicitud. Si es COMPLETED incluye las rutas. Si es FAILED incluye el motivo del error.',
+      ok: 'Estado actual de la solicitud. Devuelve sus resultados si finalizó',
       notFound: 'Solicitud no encontrada o no pertenece a tu grupo',
       unauthorized: 'API key inválida o ausente',
     },
