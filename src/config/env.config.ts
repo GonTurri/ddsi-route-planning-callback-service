@@ -56,6 +56,7 @@ export const envConfig = {
     user: requireEnv('DB_USER'),
     pass: requireEnv('DB_PASS'),
     name: requireEnv('DB_NAME'),
+    poolSize: getEnvNumberOrDefault('DB_POOL_SIZE', 10, 1),
   },
   port: requireEnvNumber('PORT'),
 

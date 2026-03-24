@@ -20,7 +20,7 @@ export class PlanRouteDto {
     example: '550e8400-e29b-41d4-a716-446655440000',
     description: 'UUID unico de la solicitud',
   })
-  @IsUUID()
+  @IsUUID('4', { message: 'El requestId debe ser un formato UUID v4 válido.' })
   requestId: string;
 
   @ApiProperty({
@@ -38,6 +38,8 @@ export class PlanRouteDto {
     type: WarehouseDto,
   })
   @ValidateNested()
+  @IsDefined({ message: 'El objeto warehouse es obligatorio' })
+  @IsNotEmptyObject({}, { message: 'El warehouse no puede estar vacío' })
   @Type(() => WarehouseDto)
   warehouse: WarehouseDto;
 
@@ -47,12 +49,15 @@ export class PlanRouteDto {
     minItems: 1,
     maxItems: 100,
   })
-  @IsArray()
-  @ArrayMinSize(1)
-  @ArrayMaxSize(100)
+  @IsArray({ message: 'El campo deliveries debe ser una lista (array).' })
+  @ArrayMinSize(1, { message: 'Debe enviar al menos 1 entrega en la lista.' })
+  @ArrayMaxSize(100, {
+    message: 'No se pueden enviar más de 100 entregas por solicitud.',
+  })
   @ValidateNested({ each: true })
   @ArrayUnique((delivery: DeliveryDto) => delivery.deliveryCode, {
-    message: 'Delivery codes must be unique within the delivery list',
+    message:
+      'Los códigos de entrega (deliveryCode) no pueden repetirse dentro de la lista.',
   })
   @Type(() => DeliveryDto)
   deliveries: DeliveryDto[];
@@ -63,9 +68,11 @@ export class PlanRouteDto {
     minItems: 1,
     maxItems: 10,
   })
-  @IsArray()
-  @ArrayMinSize(1)
-  @ArrayMaxSize(10)
+  @IsArray({ message: 'El campo trucks debe ser una lista (array).' })
+  @ArrayMinSize(1, { message: 'Debe enviar al menos 1 camión en la lista.' })
+  @ArrayMaxSize(10, {
+    message: 'No se pueden enviar más de 10 camiones por solicitud.',
+  })
   @ValidateNested({ each: true })
   @ArrayUnique((truck: TruckDto) => truck.truckId, {
     message: 'truckIds must be unique within the truck list',

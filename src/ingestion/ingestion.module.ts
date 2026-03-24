@@ -6,13 +6,16 @@ import { IngestionService } from './services/ingestion.service';
 import { IngestionController } from './controllers/ingestion.controller';
 import { GroupsModule } from '../groups/groups.module';
 import { WebhookOutbox } from 'src/dispatch/entities/webhook-outbox.entity';
+import { RoutingCacheService } from './services/routing-cache.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([RoutingRequest, StudentGroup, WebhookOutbox]),
     GroupsModule,
+    CacheModule.register(),
   ],
   controllers: [IngestionController],
-  providers: [IngestionService],
+  providers: [IngestionService, RoutingCacheService],
 })
 export class IngestionModule {}

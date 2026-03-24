@@ -51,6 +51,20 @@ class PlanningResultDto {
   unassignedDeliveries: UnassignedDeliveryDto[];
 }
 
+class RoutingErrorDto {
+  @ApiProperty({
+    example: 'UNPROCESSABLE_ROUTE',
+    description: 'Código interno del error',
+  })
+  code: string;
+
+  @ApiProperty({
+    example: 'El motor matemático no pudo procesar la ruta.',
+    description: 'Explicación técnica del rechazo',
+  })
+  message: string;
+}
+
 export class GetRouteStatusResponseDto {
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174093',
@@ -79,8 +93,8 @@ export class GetRouteStatusResponseDto {
   result?: PlanningResultDto;
 
   @ApiPropertyOptional({
-    example: 'Error matemático al calcular la ruta',
+    type: RoutingErrorDto,
     description: 'Presente solo si el estado es FAILED.',
   })
-  error?: string;
+  error?: RoutingErrorDto;
 }

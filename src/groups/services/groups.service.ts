@@ -25,7 +25,9 @@ export class GroupsService {
     });
 
     if (existingGroup) {
-      throw new ConflictException('Group name already exists');
+      throw new ConflictException(
+        'El nombre del grupo ya se encuentra registrado.',
+      );
     }
 
     const group = this.studentGroupRepository.create({
