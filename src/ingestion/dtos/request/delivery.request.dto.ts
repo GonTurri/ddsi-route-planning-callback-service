@@ -10,8 +10,10 @@ export class DeliveryDto {
     example: 'DEL-001',
     description: 'Codigo unico de la entrega',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({
+    message: 'El código de entrega (deliveryCode) debe ser un texto.',
+  })
+  @IsNotEmpty({ message: 'El código de entrega no puede estar vacío.' })
   deliveryCode: string;
 
   @ApiProperty({
@@ -19,7 +21,7 @@ export class DeliveryDto {
     description: 'Latitud del punto de entrega',
   })
   @IsLatitude()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'La latitud no puede estar vacía.' })
   latitude: number;
 
   @ApiProperty({
@@ -27,15 +29,15 @@ export class DeliveryDto {
     description: 'Longitud del punto de entrega',
   })
   @IsLongitude()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'La longitud no puede estar vacía.' })
   longitude: number;
 
   @ApiProperty({
     example: 'Av. Libertador 5000, CABA',
     description: 'Direccion de entrega',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'La dirección (address) debe ser un texto.' })
+  @IsNotEmpty({ message: 'La dirección no puede estar vacía.' })
   address: string;
 
   @ApiProperty({
@@ -43,11 +45,11 @@ export class DeliveryDto {
     description: 'Peso en kg (debe ser mayor a 0)',
     minimum: 0.01,
   })
-  @IsNumber()
+  @IsNumber({}, { message: 'El peso (WeightKg) debe ser un número válido.' })
   @IsPositive({
-    message: 'El peso (WeightKg) debe ser un número positivo mayor a 0',
+    message: 'El peso (WeightKg) debe ser un número positivo mayor a 0.',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'El peso no puede estar vacío.' })
   WeightKg: number;
 
   @ApiProperty({
@@ -55,10 +57,10 @@ export class DeliveryDto {
     description: 'Volumen en m3 (debe ser mayor a 0)',
     minimum: 0.01,
   })
-  @IsNumber()
+  @IsNumber({}, { message: 'El volumen (VolumeM3) debe ser un número válido.' })
   @IsPositive({
-    message: 'El volumen (VolumeM3) debe ser un número positivo mayor a 0',
+    message: 'El volumen (VolumeM3) debe ser un número positivo mayor a 0.',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'El volumen no puede estar vacío.' })
   VolumeM3: number;
 }

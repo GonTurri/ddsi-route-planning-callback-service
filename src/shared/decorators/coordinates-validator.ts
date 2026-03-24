@@ -16,7 +16,7 @@ export function IsLatitude(validationOptions?: ValidationOptions) {
           return typeof value === 'number' && value >= -90 && value <= 90;
         },
         defaultMessage(args: ValidationArguments) {
-          return `${args.property} must be a valid latitude (a number between -90 and 90)`;
+          return `El campo ${args.property} debe ser una latitud válida (un número entre -90 y 90).`;
         },
       },
     });
@@ -35,7 +35,7 @@ export function IsLongitude(validationOptions?: ValidationOptions) {
           return typeof value === 'number' && value >= -180 && value <= 180;
         },
         defaultMessage(args: ValidationArguments) {
-          return `${args.property} must be a valid longitude (a number between -180 and 180)`;
+          return `El campo ${args.property} debe ser una longitud válida (un número entre -180 y 180).`;
         },
       },
     });
